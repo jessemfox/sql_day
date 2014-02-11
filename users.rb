@@ -1,31 +1,32 @@
 require_relative 'questionsdatabase'
+require_relative 'questions'
 
 class Users
   attr_accessor :id, :fname, :lname
 
   def self.find_by_id(id)
-    query = <<- SQL
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, id)
       SELECT
         *
       FROM
         users
       WHERE
-        id = ?;
+        id = ?
     SQL
-    data_hash = QuestionsDB.instance.execute(query, id)
+    self.new(data_hash[0])
   end
 
   def self.find_by_name(fname, lname)
-    query = <<- SQL
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
       SELECT
         *
       FROM
         users
       WHERE
         fname = ? AND
-        lname = ?;
+        lname = ?
     SQL
-    data_hash = QuestionsDB.instance.execute(query, fname, lname)
+    data_hash.map { |row| Users.new(row) }
   end
 
   def initialize(options = {})
@@ -33,4 +34,13 @@ class Users
     @fname = options["fname"]
     @lname = options["lname"]
   end
-  send
+
+  def authored_questions
+    Questions.find_by_author_id(self.id)
+  end
+
+  def authored_replies
+    Replies.find_by_user_id(self.id)
+  end
+
+end

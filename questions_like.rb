@@ -4,15 +4,15 @@ class QuestionLikes
   attr_accessor :id, :question_id, :user_id
 
   def self.find_by_id(id)
-    query = <<- SQL
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, id)
       SELECT
         *
       FROM
         question_likes
       WHERE
-        id = ?;
+        id = ?
     SQL
-    data_hash = QuestionsDB.instance.execute(query, id)
+    self.new(data_hash)
   end
 
   def initialize(options = {})
