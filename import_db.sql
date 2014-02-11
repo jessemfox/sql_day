@@ -45,14 +45,14 @@ CREATE TABLE question_likes(
 );
 
 INSERT INTO
-	users(fname, lname)
+	users (fname, lname)
 VALUES
 	('Jesse', 'Fox'),
-	('Teo', 'Dell');
+	('Teo', 'Dell'),
 	('Buck', 'TA');
 
 INSERT INTO
-	questions(title, body, user_id)
+	questions (title, body, user_id)
 VALUES
 	('Name', 'What is your name? I am quite curious.',
 	  (SELECT id FROM users WHERE fname = 'Jesse')),
@@ -71,26 +71,7 @@ VALUES
 	 (SELECT user_id FROM questions WHERE title = 'Name'),
 	 'this is the body of our reply');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+INSERT INTO
+	question_likes (user_id, question_id)
+VALUES
+	(1, 1);
