@@ -48,4 +48,8 @@ class Users
     QuestionFollowers.followed_questions_for_user_id(self.id)
   end
 
+  def liked_question
+    QuestionLikes.liked_questions_for_user_id(self.id)
+  end
+
 end

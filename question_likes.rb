@@ -1,4 +1,5 @@
 require_relative 'questionsdatabase'
+require_relative 'users'
 
 class QuestionLikes
   attr_accessor :id, :question_id, :user_id
@@ -13,6 +14,41 @@ class QuestionLikes
         id = ?
     SQL
     self.new(data_hash)
+  end
+
+  def self.likers_for_question_id(question_id)
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, question_id)
+    SELECT u.*
+    FROM question_likes ql
+    JOIN questions q ON q.id = ql.question_id
+    JOIN users u ON u.id = ql.user_id
+    WHERE q.id = ?
+    SQL
+    data_hash.map { |row| Users.new(row) }
+  end
+
+  def self.num_likes_for_question_id(question_id)
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, question_id)
+    SELECT COUNT (*)
+    FROM question_likes ql
+    JOIN questions q ON q.id = ql.question_id
+    JOIN users u ON u.id = ql.user_id
+    WHERE q.id = ?
+
+    SQL
+    data_hash[0].values.first
+  end
+
+  def self.liked_questions_for_user_id(user_id)
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, user_id)
+    SELECT q.*
+    FROM question_likes ql
+    JOIN questions q ON q.id = ql.question_id
+    JOIN users u ON u.id = ql.user_id
+    WHERE q.user_id = ?
+
+    SQL
+    data_hash.map { |row| Questions.new(row) }
   end
 
   def initialize(options = {})
