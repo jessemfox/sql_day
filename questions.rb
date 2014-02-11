@@ -1,6 +1,7 @@
 require_relative 'questionsdatabase'
 require_relative 'users'
 require_relative 'replies'
+require_relative 'question_followers'
 
 class Questions
   attr_accessor :id, :title, :body, :user_id
@@ -29,6 +30,10 @@ class Questions
     data_hash.map { |row| Questions.new(row) }
   end
 
+  def self.most_followed(n)
+    QuestionFollowers.most_followed_questions(n)
+  end
+
   def initialize(options = {})
     @id = options["id"]
     @title = options["title"]
@@ -52,5 +57,10 @@ class Questions
   def replies
     Replies.find_by_question_id(self.id)
   end
+
+  def followers
+    QuestionFollowers.followers_for_question_id(self.id)
+  end
+
 
 end
