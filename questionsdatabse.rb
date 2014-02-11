@@ -27,6 +27,20 @@ class Users
     data_hash = QuestionsDB.instance.execute(query, id)
   end
 
+  def self.find_by_name(fname, lname)
+    query = <<- SQL
+      SELECT
+        *
+      FROM
+        users
+      WHERE
+        fname = ? AND
+        lname = ?;
+    SQL
+    data_hash = QuestionsDB.instance.execute(query, fname, lname)
+  end
+
+
   def initialize(options = {})
     @id = options["id"]
     @fname = options["fname"]
