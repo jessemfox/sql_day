@@ -2,6 +2,7 @@ require_relative 'questionsdatabase'
 require_relative 'users'
 require_relative 'replies'
 require_relative 'question_followers'
+require_relative 'question_likes'
 
 class Questions
   attr_accessor :id, :title, :body, :user_id
@@ -32,6 +33,10 @@ class Questions
 
   def self.most_followed(n)
     QuestionFollowers.most_followed_questions(n)
+  end
+
+  def self.most_liked(n)
+    QuestionLikes.most_liked_questions(n)
   end
 
   def initialize(options = {})
@@ -68,6 +73,31 @@ class Questions
 
   def num_likes
     QuestionLikes.num_likes_for_question_id(self.id)
+  end
+
+  def save
+    params = [self.title, self.body, self.user_id]
+    if self.id.nil?
+      QuestionsDatabase.instance.execute(<<-SQL, *params)
+      INSERT INTO
+        questions (title, body, user_id)
+        VALUES
+        (?, ?, ?)
+      SQL
+      @id = QuestionsDatabase.instance.last_insert_row_id
+    else
+      i = self.id
+      QuestionsDatabase.instance.execute(<<-SQL, *params, i)
+      UPDATE
+        questions
+      SET
+        title = ?,
+        body = ?,
+        user_id = ?
+      WHERE
+      id = ?
+      SQL
+    end
   end
 
 end

@@ -52,4 +52,55 @@ class Users
     QuestionLikes.liked_questions_for_user_id(self.id)
   end
 
+  def avg_karma
+    i = self.id
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, i)
+
+    /* total # of likes */
+    SELECT
+      COUNT (*)
+    FROM
+      users u JOIN question_likes ql ON u.id = ql.user_id
+      JOIN questions q ON q.id = ql.question_id
+    WHERE
+      q.user_id = ?
+
+
+    /* total number of posts
+
+    (SELECT
+          COUNT(*)
+        FROM
+          questions
+        WHERE
+          user_id = ?)
+    */
+
+    SQL
+  end
+
+  def save
+    params = [self.fname, self.lname]
+    if self.id.nil?
+      QuestionsDatabase.instance.execute(<<-SQL, *params)
+      INSERT INTO
+        users (fname, lname)
+        VALUES
+        (?, ?)
+      SQL
+      @id = QuestionsDatabase.instance.last_insert_row_id
+    else
+      i = self.id
+      QuestionsDatabase.instance.execute(<<-SQL, *params, i)
+      UPDATE
+        users
+      SET
+        fname = ?,
+        lname = ?
+      WHERE
+      id = ?
+      SQL
+    end
+  end
+
 end

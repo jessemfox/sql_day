@@ -102,4 +102,30 @@ class Replies
     data_hash.map { |row| Replies.new(row) }
   end
 
+  def save
+    params = [self.question_id, self.parent_reply_id, self.user_id, self.body]
+    if self.id.nil?
+      QuestionsDatabase.instance.execute(<<-SQL, *params)
+      INSERT INTO
+        replies (question_id, parent_reply_id, user_id, body)
+        VALUES
+        (?, ?, ?, ?)
+      SQL
+      @id = QuestionsDatabase.instance.last_insert_row_id
+    else
+      i = self.id
+      QuestionsDatabase.instance.execute(<<-SQL, *params, i)
+      UPDATE
+        replies
+      SET
+        question_id = ?,
+        parent_reply_id = ?,
+        user_id = ?,
+        body = ?
+      WHERE
+      id = ?
+      SQL
+    end
+  end
+
 end

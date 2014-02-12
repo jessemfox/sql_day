@@ -44,7 +44,7 @@ class QuestionFollowers
   def self.most_followed_questions(n)
     data_hash = QuestionsDatabase.instance.execute(<<-SQL, n)
     SELECT
-     q.*, COUNT(*)
+     q.*
     FROM question_followers qf
     JOIN questions q ON q.id = qf.question_id
     JOIN users u ON u.id = qf.user_id

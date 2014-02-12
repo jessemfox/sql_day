@@ -51,6 +51,21 @@ class QuestionLikes
     data_hash.map { |row| Questions.new(row) }
   end
 
+
+  def self.most_liked_questions(n)
+    data_hash = QuestionsDatabase.instance.execute(<<-SQL, n)
+    SELECT
+     q.*
+    FROM question_likes ql
+    JOIN questions q ON q.id = ql.question_id
+    JOIN users u ON u.id = ql.user_id
+    GROUP BY ql.question_id
+    ORDER BY COUNT(*) DESC LIMIT ?
+    SQL
+    data_hash.map { |row| Questions.new(row) }
+  end
+
+
   def initialize(options = {})
     @id = options["id"]
     @question_id = options["question_id"]
