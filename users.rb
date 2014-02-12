@@ -55,28 +55,15 @@ class Users
   def avg_karma
     i = self.id
     data_hash = QuestionsDatabase.instance.execute(<<-SQL, i)
-
-    /* total # of likes */
     SELECT
-      COUNT (*)
+      CAST((COUNT(ql.user_id) / COUNT(DISTINCT q.id)) AS FLOAT) as avg_likes
     FROM
       users u JOIN question_likes ql ON u.id = ql.user_id
       JOIN questions q ON q.id = ql.question_id
     WHERE
       q.user_id = ?
-
-
-    /* total number of posts
-
-    (SELECT
-          COUNT(*)
-        FROM
-          questions
-        WHERE
-          user_id = ?)
-    */
-
     SQL
+    data_hash[0]['avg_likes']
   end
 
   def save
